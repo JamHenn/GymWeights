@@ -89,14 +89,16 @@ print(f"Number of weight combinations: {len(all_weights)}")
 
 
 # Write to .txt file
-with open('BarbellWeights.txt', 'w') as f1, open('TrapBarWeights.txt', 'w') as f2:
+barbell_file = 'output/BarbellWeights.txt'
+trapbar_file = 'output/TrapBarWeights.txt'
+with open(barbell_file, 'w') as bfile, open(trapbar_file, 'w') as tfile:
     for total, weights in all_weights:
         big_plates, small_plates = split_at(weights, 10.0)
 
         # Standard barbell weights
         if is_barbell_weight(total, weights):
-            f1.write(plate_combination_string(False, total, big_plates, small_plates))
+            bfile.write(plate_combination_string(False, total, big_plates, small_plates))
 
         # Trap bar deadlift weights
         if is_trap_bar_weight(total+10, big_plates, small_plates):
-            f2.write(plate_combination_string(True, total, big_plates, small_plates))
+            tfile.write(plate_combination_string(True, total, big_plates, small_plates))
