@@ -1,34 +1,6 @@
-from itertools import chain, combinations
-
-
-def weight(plates):
-    """
-    Calculate the total weight of a barbell with the given list of plates
-    on both sides
-    """
-
-    return round(20.0 + 2 * sum(plates), 1)
-
-
-def powerset(iterable):
-    s = list(iterable)
-    return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
-
-
-def split_at(ls, value):
-    """
-    Spilt a list at the given value
-    """
-
-    above, below = [], []
-
-    for element in ls:
-        if element < value:
-            below.append(element)
-        else:
-            above.append(element)
-
-    return above, below
+from itertools import chain
+from list_module import powerset, sort_and_deduplicate, split_at
+from barbell_module import total_barbell_weight, is_barbell_weight, is_trap_bar_weight
 
 
 def possible_combinations(optional, must_include = []):
@@ -51,69 +23,6 @@ def possible_combinations(optional, must_include = []):
 
     # Sort the plates in descending order for each combination
     return [sorted(combo + tuple(must_include), reverse = True) for combo in combos]
-
-
-def unique(lst):
-    """
-    Return the unique elements of an ordered list
-
-    Input: An ordered list
-    """
-
-    last = object()
-
-    for item in lst:
-        if item == last:
-            continue
-        yield item
-        last = item
-
-
-def sort_and_deduplicate(l, key):
-    """
-    Sort a list with the given key, and remove duplicates
-    """
-
-    # combos are sorted by total weight, but not by plate configuration
-    # So 2 identical combinations could be separated by a third combination
-    # with the same total weight.
-    # Since the list is not fully sorted, some duplicates will remain
-    return list(unique(sorted(l, key = key)))
-
-
-def is_trap_bar_weight(total, big_plates, small_plates):
-    # Total weight on 30kg trap bar exceeds 120
-    # 22.65 and 20.0 plates are used
-    if (total > 120) and ({20.0, 22.65} <= set(big_plates)):
-        # If 5 big plates are used, no more than 6 plates total can fit
-        if len(big_plates) >= 5:
-            return len(big_plates) + len(small_plates) <= 6
-
-        # If 4 big plates are used, no more than 7 plates total can fit
-        if len(big_plates) == 4:
-            # Can replace with 2.5 on the shorter side
-            if small_plates.count(1.25) == 2:
-                return len(small_plates) <= 4;
-            return len(small_plates) <= 3
-
-        return True
-    return False
-
-
-def is_barbell_weight(total, plates):
-    # Don't use 22.65 plates
-    if (22.65 in plates) or (20.0 in plates):
-        return False
-
-    # Don't use 20.0 on a weight less than 80
-    #if (total < 120) and (20.0 in plates):
-    #    return False
-
-    # Cut off at 145
-    if (total > 145):
-        return False
-
-    return True
 
 
 def barbell_section_string(big_plates, small_plates):
@@ -206,7 +115,7 @@ combinations = list(chain(possible_combinations(plates),
                           possible_combinations(plates32, [10.0, 22.65])))
 
 # Find the total weight of each combination
-all_weights = [(weight(combo), combo) for combo in combinations]
+all_weights = [(total_barbell_weight(combo), combo) for combo in combinations]
 # Sort by total weight; Remove duplicates
 all_weights = sort_and_deduplicate(all_weights, key = lambda tup: tup[0])
 
@@ -214,7 +123,7 @@ print(f"Number of weight combinations: {len(all_weights)}")
 
 
 # Write to .txt file
-with open('BarbellWeights_June2021.txt', 'w') as f1, open('TrapBarWeights_June2021.txt', 'w') as f2:
+with open('BarbellWeights_2023.txt', 'w') as f1, open('TrapBarWeights_2023.txt', 'w') as f2:
     for total, weights in all_weights:
 
         big_plates, small_plates = split_at(weights, 10.0)
