@@ -3,7 +3,7 @@ from list_module import powerset, sort_and_deduplicate, split_at
 from barbell_module import total_barbell_weight, is_barbell_weight, is_trap_bar_weight
 
 
-def possible_combinations(optional, must_include = []):
+def weight_combinations(optional, must_include = []):
     """
     Generate every possible combination of weights
 
@@ -74,16 +74,17 @@ plates22 = [1.1, 1.25, 1.25, 2.2, 4.5, 5.0, 10.0, 11.3, 15.0, 15.9, 20.0]
 plates32 = [1.1, 1.25, 1.25, 2.2, 4.5, 10.0, 11.3, 15.0, 15.9, 20.0]
 
 
-combinations = list(chain(possible_combinations(plates),
-                          possible_combinations(plates10, [10.0]),
-                          possible_combinations(plates15, [5.0, 10.0]),
-                          possible_combinations(plates22, [22.65]),
-                          possible_combinations(plates32, [10.0, 22.65])))
+combinations = list(chain(weight_combinations(plates),
+                          weight_combinations(plates10, [10.0]),
+                          weight_combinations(plates15, [5.0, 10.0]),
+                          weight_combinations(plates22, [22.65]),
+                          weight_combinations(plates32, [10.0, 22.65])))
 
 # Find the total weight of each combination
 all_weights = [(total_barbell_weight(combo), combo) for combo in combinations]
 # Sort by total weight; Remove duplicates
-all_weights = sort_and_deduplicate(all_weights, key = lambda tup: tup[0])
+#all_weights = sort_and_deduplicate2(all_weights)#, key = lambda tup: tup[0])
+all_weights = sort_and_deduplicate(all_weights, key = lambda t: (-t[0], t[1]), reverseFlag=True)
 
 print(f"Number of weight combinations: {len(all_weights)}")
 

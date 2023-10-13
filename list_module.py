@@ -29,11 +29,6 @@ def unique(lst):
         last = item
 
 
-def sort_and_deduplicate(l, key):
+def sort_and_deduplicate(l, key, reverseFlag=False):
     """ Sort a list with the given key, and remove duplicates """
-
-    # combos are sorted by total weight, but not by plate configuration
-    # So 2 identical combinations could be separated by a third combination
-    # with the same total weight.
-    # Since the list is not fully sorted, some duplicates will remain
-    return list(unique(sorted(l, key = key)))
+    return list(unique(sorted(l, key=key, reverse=reverseFlag)))
