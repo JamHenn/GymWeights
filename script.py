@@ -25,7 +25,6 @@ combinations = list(chain(weight_combinations(plates),
 # Find the total weight of each combination
 all_weights = [(total_barbell_weight(combo), combo) for combo in combinations]
 # Sort by total weight; Remove duplicates
-#all_weights = sort_and_deduplicate2(all_weights)#, key = lambda tup: tup[0])
 all_weights = sort_and_deduplicate(all_weights, key = lambda t: (-t[0], t[1]), reverseFlag=True)
 
 print(f"Number of weight combinations: {len(all_weights)}")
