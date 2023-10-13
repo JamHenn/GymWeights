@@ -25,75 +25,41 @@ def possible_combinations(optional, must_include = []):
     return [sorted(combo + tuple(must_include), reverse = True) for combo in combos]
 
 
-def barbell_section_string(big_plates, small_plates):
+def plate_combination_string(is_trap_bar, total, big_plates, small_plates):
     """
-    Write a section of the BarbellWeights.txt file
-
-    Line length is:
+    Barbell line length is:
     6 (total) + 6*5 (6 big plates) = 36 characters
 
-    Small plates (7): Up to 29 characters
-    """
-    section = ""
-
-    # Unique big plates. Two 10s is accounted for below.
-    all_big_plates = [15.9, 15.0, 11.3, 10.0]
-
-    # Big weights (separated into columns)
-    for p in all_big_plates:
-        if p in big_plates:
-            # Write the plate (5 characters, right-aligned)
-            section += f"{str(p):>5}" * big_plates.count(p)
-
-        else:
-            # Leave a gap (5 characters)
-            section += " "*5
-
-    # 2nd line: Leave gap under total
-    section += "\n" + " "*7
-
-    # Small weights (29 characters, right-justified)
-    section += "{0:>29}".format(" ".join(str(p) for p in small_plates))
-
-    # Line of dashes
-    section += "\n" + "-"*36 + "\n"
-
-    return section
-
-
-def trap_bar_section_string(big_plates, small_plates):
-    """
-    Write a section of the .txt file
-
-    Line length is:
+    Trap bar line length is:
     6 (total) + 7*5 (7 big plates) = 41 characters
-
-    Small plates (7): Up to 29 characters
     """
-    section = ""
+    line_length = 41 if is_trap_bar else 36
 
-    all_big_plates = [22.65, 20.0, 15.9, 15.0, 11.3, 10.0]
+    # Unique big plates
+    if is_trap_bar: all_big_plates = [22.65, 20.0, 15.9, 15.0, 11.3, 10.0]
+    else: all_big_plates = [15.9, 15.0, 11.3, 10.0]
 
-    # Big weights (separated into columns)
+    # Write total weight (+10kg for trap bar)
+    text = f"{total+10:>5}:" if is_trap_bar else f"{total:>5}:"
+
+    # Write big weights (separated into columns)
     for p in all_big_plates:
         if p in big_plates:
             # Write the plate (5 characters, right-aligned)
-            section += f"{str(p)[:4]:>5}" * big_plates.count(p)
+            text += f"{str(p)[:4]:>5}" * big_plates.count(p)
 
-        else:
-            # Leave a gap (5 characters)
-            section += " "*5
+        else: text += " "*5 # Leave a gap (5 characters)
 
-    # 2nd line: Leave gap under total
-    section += "\n" + " "*12
+    # Write small weights (right-justified)
+    if is_trap_bar:
+        text += "\n{0:>41}".format(" ".join(str(p) for p in small_plates))
+    else:
+        text += "\n{0:>36}".format(" ".join(str(p) for p in small_plates))
 
-    # Small weights (29 characters, right-justified)
-    section += "{0:>29}".format(" ".join(str(p) for p in small_plates))
+    # Write line of dashes
+    text += "\n" + "-"*line_length + "\n"
 
-    # Line of dashes
-    section += "\n" + "-"*41 + "\n"
-
-    return section
+    return text
 
 
 # Weights that come in pairs
@@ -123,22 +89,14 @@ print(f"Number of weight combinations: {len(all_weights)}")
 
 
 # Write to .txt file
-with open('BarbellWeights_2023.txt', 'w') as f1, open('TrapBarWeights_2023.txt', 'w') as f2:
+with open('BarbellWeights.txt', 'w') as f1, open('TrapBarWeights.txt', 'w') as f2:
     for total, weights in all_weights:
-
         big_plates, small_plates = split_at(weights, 10.0)
 
         # Standard barbell weights
         if is_barbell_weight(total, weights):
-            # Total value
-            f1.write(f"{total:>5}:")
-            # Plate breakdown
-            f1.write(barbell_section_string(big_plates, small_plates))
-
+            f1.write(plate_combination_string(False, total, big_plates, small_plates))
 
         # Trap bar deadlift weights
         if is_trap_bar_weight(total+10, big_plates, small_plates):
-            # Total value (30 kg trap bar)
-            f2.write(f"{total+10:>5}:")
-            # Plate breakdown
-            f2.write(trap_bar_section_string(big_plates, small_plates))
+            f2.write(plate_combination_string(True, total, big_plates, small_plates))
